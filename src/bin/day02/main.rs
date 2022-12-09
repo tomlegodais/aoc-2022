@@ -1,4 +1,4 @@
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone, Copy)]
 enum Gesture {
     Rock,
     Paper,
@@ -6,7 +6,7 @@ enum Gesture {
 }
 
 impl Gesture {
-    fn parse_gesture(gesture_str: &str) -> Gesture {
+    fn parse_gesture(gesture_str: &str) -> Self {
         return match gesture_str {
             "A" | "X" => Gesture::Rock,
             "B" | "Y" => Gesture::Paper,
@@ -15,7 +15,23 @@ impl Gesture {
         };
     }
 
-    fn get_weakness(&self) -> Gesture {
+    fn parse_outcome(outcome: &Outcome, opponent_gesture: Gesture) -> Self {
+        return match outcome {
+            Outcome::Win => opponent_gesture.get_weakness(),
+            Outcome::Loss => opponent_gesture.get_superior(),
+            Outcome::Draw => opponent_gesture,
+        };
+    }
+
+    fn get_superior(&self) -> Self {
+        return match &self {
+            Gesture::Rock => Gesture::Scissor,
+            Gesture::Paper => Gesture::Rock,
+            Gesture::Scissor => Gesture::Paper
+        };
+    }
+
+    fn get_weakness(&self) -> Self {
         return match &self {
             Gesture::Rock => Gesture::Paper,
             Gesture::Paper => Gesture::Scissor,
@@ -32,26 +48,57 @@ impl Gesture {
     }
 }
 
+enum Outcome {
+    Win,
+    Loss,
+    Draw,
+}
+
+impl Outcome {
+    fn parse_outcome(outcome_str: &str) -> Self {
+        return match outcome_str {
+            "X" => Self::Loss,
+            "Y" => Self::Draw,
+            "Z" => Self::Win,
+            _ => panic!("Unknown outcome (outcome_str={})!", outcome_str)
+        };
+    }
+}
+
 pub fn main() -> anyhow::Result<()> {
     let lines = aoc::read_lines("src/bin/day02/input.txt")?;
-    let total_score: i32 = lines
-        .into_iter()
-        .map(|l: String| {
-            let mut split = l.split_whitespace();
-            let opponent_gesture = Gesture::parse_gesture(split.next().unwrap());
-            let self_gesture = Gesture::parse_gesture(split.next().unwrap());
-            let score = self_gesture.get_score();
-            let round_modifier = match (opponent_gesture, self_gesture) {
-                (p1, p2) if p1 == p2 => 3,
-                (p1, p2) if p1.get_weakness() == p2 => 6,
-                (_, _) => 0
-            };
 
-            score + round_modifier
-        })
-        .fold(0, |acc, x| acc + x);
+    let part_one_score = calculate_score(&lines, false);
+    println!("Part One = {}", part_one_score);
 
-    println!("Part One = {}", total_score);
+    let part_two_score = calculate_score(&lines, true);
+    println!("Part Two = {}", part_two_score);
 
     Ok(())
+}
+
+fn calculate_score(lines: &Vec<String>, part_two: bool) -> i32 {
+    lines
+        .iter()
+        .map(|l: &String| {
+            let mut split = l.split_whitespace();
+            let opponent_gesture = Gesture::parse_gesture(split.next().unwrap());
+            let self_gesture = if !part_two {
+                Gesture::parse_gesture(split.next().unwrap())
+            } else {
+                let outcome = Outcome::parse_outcome(split.next().unwrap());
+                Gesture::parse_outcome(&outcome, opponent_gesture)
+            };
+
+            (self_gesture, get_round_modifier(opponent_gesture, self_gesture))
+        })
+        .fold(0, |acc, (self_gesture, round_modifier)| acc + self_gesture.get_score() + round_modifier)
+}
+
+fn get_round_modifier(opponent_gesture: Gesture, self_gesture: Gesture) -> i32 {
+    return match (opponent_gesture, self_gesture) {
+        (p1, p2) if p1 == p2 => 3,
+        (p1, p2) if p1.get_weakness() == p2 => 6,
+        (_, _) => 0
+    };
 }
