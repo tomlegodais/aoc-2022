@@ -7,44 +7,44 @@ enum Gesture {
 
 impl Gesture {
     fn parse_gesture(gesture_str: &str) -> Self {
-        return match gesture_str {
+        match gesture_str {
             "A" | "X" => Gesture::Rock,
             "B" | "Y" => Gesture::Paper,
             "C" | "Z" => Gesture::Scissor,
             _ => panic!("Unknown gesture (gesture_str={})!", gesture_str)
-        };
+        }
     }
 
     fn parse_outcome(outcome: &Outcome, opponent_gesture: Gesture) -> Self {
-        return match outcome {
+        match outcome {
             Outcome::Win => opponent_gesture.get_weakness(),
             Outcome::Loss => opponent_gesture.get_superior(),
             Outcome::Draw => opponent_gesture,
-        };
+        }
     }
 
     fn get_superior(&self) -> Self {
-        return match &self {
+        match self {
             Gesture::Rock => Gesture::Scissor,
             Gesture::Paper => Gesture::Rock,
             Gesture::Scissor => Gesture::Paper
-        };
+        }
     }
 
     fn get_weakness(&self) -> Self {
-        return match &self {
+        match self {
             Gesture::Rock => Gesture::Paper,
             Gesture::Paper => Gesture::Scissor,
             Gesture::Scissor => Gesture::Rock,
-        };
+        }
     }
 
     fn get_score(&self) -> i32 {
-        return match &self {
+        match self {
             Gesture::Rock => 1,
             Gesture::Paper => 2,
             Gesture::Scissor => 3,
-        };
+        }
     }
 }
 
@@ -56,12 +56,12 @@ enum Outcome {
 
 impl Outcome {
     fn parse_outcome(outcome_str: &str) -> Self {
-        return match outcome_str {
+        match outcome_str {
             "X" => Self::Loss,
             "Y" => Self::Draw,
             "Z" => Self::Win,
             _ => panic!("Unknown outcome (outcome_str={})!", outcome_str)
-        };
+        }
     }
 }
 
@@ -96,9 +96,9 @@ fn calculate_score(lines: &Vec<String>, part_two: bool) -> i32 {
 }
 
 fn get_round_modifier(opponent_gesture: Gesture, self_gesture: Gesture) -> i32 {
-    return match (opponent_gesture, self_gesture) {
+    match (opponent_gesture, self_gesture) {
         (p1, p2) if p1 == p2 => 3,
         (p1, p2) if p1.get_weakness() == p2 => 6,
         (_, _) => 0
-    };
+    }
 }
