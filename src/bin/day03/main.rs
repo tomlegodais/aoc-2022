@@ -4,7 +4,14 @@ pub fn main() -> anyhow::Result<()> {
         .chain('A'..='Z')
         .collect::<Vec<_>>();
 
-    let total_sum = lines
+    let total_sum = solve_part_01(&lines, &priorities);
+    println!("Part One = {}", total_sum);
+
+    Ok(())
+}
+
+fn solve_part_01(lines: &Vec<String>, priorities: &Vec<char>) -> usize {
+    lines
         .iter()
         .fold(0, |acc, line| {
             let (first_compartment, second_compartment) = line.split_at(line.len() / 2);
@@ -17,9 +24,5 @@ pub fn main() -> anyhow::Result<()> {
                 .unwrap();
 
             acc + priority
-        });
-
-    println!("Part One = {}", total_sum);
-
-    Ok(())
+        })
 }
