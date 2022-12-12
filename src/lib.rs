@@ -40,6 +40,12 @@ pub fn rem_first_last(value: String) -> String {
     chars.as_str().to_owned()
 }
 
+pub fn find_common_char(strings: &Vec<String>) -> Option<char> {
+    ('a'..='z')
+        .chain('A'..='Z')
+        .find(|&c| strings.iter().all(|s| s.contains(c)))
+}
+
 #[cfg(test)]
 mod tests {
     use spectral::prelude::*;

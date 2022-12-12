@@ -7,6 +7,9 @@ pub fn main() -> anyhow::Result<()> {
     let total_sum = solve_part_01(&lines, &priorities);
     println!("Part One = {}", total_sum);
 
+    let total_sum = solve_part_02(&lines, &priorities);
+    println!("Part Two = {}", total_sum);
+
     Ok(())
 }
 
@@ -25,4 +28,20 @@ fn solve_part_01(lines: &Vec<String>, priorities: &Vec<char>) -> usize {
 
             acc + priority
         })
+}
+
+fn solve_part_02(lines: &Vec<String>, priorities: &Vec<char>) -> usize {
+    let chunks = lines
+        .chunks(3)
+        .map(|chunk| chunk.to_vec())
+        .collect::<Vec<Vec<String>>>();
+
+    chunks
+        .iter()
+        .map(|chunk| aoc::find_common_char(chunk))
+        .map(|common_char| priorities
+            .iter()
+            .position(|x| *x == common_char.unwrap())
+            .unwrap() + 1)
+        .sum()
 }
