@@ -7,14 +7,13 @@ pub fn main() -> anyhow::Result<()> {
     let total_sum = lines
         .iter()
         .fold(0, |acc, line| {
-            let half_length = line.len() / 2;
-            let first_compartment = &line[..half_length];
-            let second_compartment = &line[half_length..];
+            let (first_compartment, second_compartment) = line.split_at(line.len() / 2);
             let priority = first_compartment
                 .chars()
-                .filter(|x| second_compartment.chars().any(|y| *x == y))
-                .map(|chr| priorities.iter().position(|x| *x == chr).unwrap() + 1)
-                .min()
+                .find_map(|x| second_compartment
+                    .chars()
+                    .find(|y| x == *y)
+                    .map(|chr| priorities.iter().position(|x| *x == chr).unwrap() + 1))
                 .unwrap();
 
             acc + priority
