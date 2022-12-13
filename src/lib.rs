@@ -53,7 +53,7 @@ pub fn find_common_char(strings: &Vec<String>) -> Option<char> {
 pub fn check_range<T>(r1: &Range<T>, r2: &Range<T>) -> bool
     where T: Sized + PartialOrd
 {
-    r1.start >= r2.start && r1.end <= r2.end
+    (r1.start >= r2.start && r1.end <= r2.end) || (r1.start <= r2.start && r1.end >= r2.end)
 }
 
 pub fn check_any_inclusive<T>(r1: Range<T>, r2: Range<T>) -> bool

@@ -26,9 +26,9 @@ fn check_overlap(lines: &Vec<String>, regex: &Regex, full_overlap: bool) -> u32 
 
             let first_range = range_data[0]..range_data[1];
             let second_range = range_data[2]..range_data[3];
-            match (full_overlap, aoc::check_range(&first_range, &second_range), aoc::check_range(&second_range, &first_range)) {
-                (true, true, _) | (true, _, true) => Some(1),
-                (false, _, _) if aoc::check_any_inclusive(first_range, second_range) => Some(1),
+            match full_overlap {
+                true if aoc::check_range(&first_range, &second_range) => Some(1),
+                false if aoc::check_any_inclusive(first_range, second_range) => Some(1),
                 _ => None
             }
         })
