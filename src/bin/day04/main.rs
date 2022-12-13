@@ -3,7 +3,18 @@ use regex::Regex;
 pub fn main() -> anyhow::Result<()> {
     let lines = aoc::read_lines("src/bin/day04/input.txt")?;
     let regex = Regex::new(r"(\d+)-(\d+),(\d+)-(\d+)")?;
-    let total_overlap = lines
+
+    let full_overlap_total = check_overlap(&lines, &regex, true);
+    println!("Part One = {}", full_overlap_total);
+
+    let overlap_total = check_overlap(&lines, &regex, false);
+    println!("Part Two = {}", overlap_total);
+
+    Ok(())
+}
+
+fn check_overlap(lines: &Vec<String>, regex: &Regex, full_overlap: bool) -> u32 {
+    lines
         .iter()
         .filter_map(|line| {
             let range_data = regex.captures(&line)
@@ -15,14 +26,11 @@ pub fn main() -> anyhow::Result<()> {
 
             let first_range = range_data[0]..range_data[1];
             let second_range = range_data[2]..range_data[3];
-            match (aoc::check_range(&first_range, &second_range), aoc::check_range(&second_range, &first_range)) {
-                (true, _) | (_, true) => Some(1),
+            match (full_overlap, aoc::check_range(&first_range, &second_range), aoc::check_range(&second_range, &first_range)) {
+                (true, true, _) | (true, _, true) => Some(1),
+                (false, _, _) if aoc::check_any_inclusive(first_range, second_range) => Some(1),
                 _ => None
             }
         })
-        .sum::<u32>();
-
-    println!("Part One = {}", total_overlap);
-
-    Ok(())
+        .sum::<u32>()
 }

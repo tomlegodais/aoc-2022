@@ -1,6 +1,9 @@
+#![feature(step_trait)]
+
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::iter::Step;
 use std::ops::Range;
 use std::path::Path;
 
@@ -51,6 +54,15 @@ pub fn check_range<T>(r1: &Range<T>, r2: &Range<T>) -> bool
     where T: Sized + PartialOrd
 {
     r1.start >= r2.start && r1.end <= r2.end
+}
+
+pub fn check_any_inclusive<T>(r1: Range<T>, r2: Range<T>) -> bool
+    where T: Sized + Step
+{
+    let mut r1_inclusive = r1.start..=r1.end;
+    let mut r2_inclusive = r2.start..=r2.end;
+
+    r1_inclusive.any(|x| r2_inclusive.contains(&x)) || r2_inclusive.any(|y| r1_inclusive.contains(&y))
 }
 
 #[cfg(test)]
