@@ -31,17 +31,10 @@ fn solve_part_01(lines: &Vec<String>, priorities: &Vec<char>) -> usize {
 }
 
 fn solve_part_02(lines: &Vec<String>, priorities: &Vec<char>) -> usize {
-    let chunks = lines
+    lines
         .chunks(3)
-        .map(|chunk| chunk.to_vec())
-        .collect::<Vec<Vec<String>>>();
-
-    chunks
-        .iter()
-        .map(|chunk| aoc::find_common_char(chunk))
-        .map(|common_char| priorities
-            .iter()
-            .position(|x| *x == common_char.unwrap())
-            .unwrap() + 1)
+        .map(|chunk| aoc::find_common_char(&chunk.to_vec()))
+        .filter(|common_char| common_char.is_some())
+        .map(|common_char| common_char.and_then(|c| priorities.iter().position(|x| *x == c)).unwrap() + 1)
         .sum()
 }

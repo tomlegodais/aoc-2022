@@ -21,8 +21,8 @@ pub fn main() -> anyhow::Result<()> {
     let maximum_calories = sorted_calories.clone().last().unwrap();
     let nth_calories: _ = sorted_calories.clone().rev().take(3).sum::<i32>();
 
-    println!("part one = {}", maximum_calories);
-    println!("part two = {}", nth_calories);
+    println!("Part One = {}", maximum_calories);
+    println!("Part Two = {}", nth_calories);
 
     Ok(())
 }
