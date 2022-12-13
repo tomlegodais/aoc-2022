@@ -1,6 +1,7 @@
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::ops::Range;
 use std::path::Path;
 
 pub fn read_lines(filename: impl AsRef<Path>) -> anyhow::Result<Vec<String>> {
@@ -44,6 +45,12 @@ pub fn find_common_char(strings: &Vec<String>) -> Option<char> {
     ('a'..='z')
         .chain('A'..='Z')
         .find(|&c| strings.iter().all(|s| s.contains(c)))
+}
+
+pub fn check_range<T>(r1: &Range<T>, r2: &Range<T>) -> bool
+    where T: Sized + PartialOrd
+{
+    r1.start >= r2.start && r1.end <= r2.end
 }
 
 #[cfg(test)]
