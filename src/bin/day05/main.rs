@@ -9,15 +9,18 @@ pub fn main() -> anyhow::Result<()> {
         .position(|r: &String| r.contains("move"))
         .unwrap();
 
-    let solution_part_one = solve_part_one(&lines, &index)?;
+    let solution_part_one = process_crates(&lines, &index, false)?;
     println!("Part One = {}", solution_part_one);
+
+    let solution_part_two = process_crates(&lines, &index, true)?;
+    println!("Part Two = {}", solution_part_two);
 
     Ok(())
 }
 
-fn solve_part_one(lines: &Vec<String>, index: &usize) -> anyhow::Result<String> {
+fn process_crates(lines: &Vec<String>, index: &usize, part_two: bool) -> anyhow::Result<String> {
     let mut crate_stacks = create_stacks(&lines, index)?;
-    let _ = parse_movements(&mut crate_stacks, &lines, index)?;
+    let _ = parse_movements(&mut crate_stacks, &lines, index, part_two)?;
 
     Ok(read_top_stacks(&mut crate_stacks))
 }
@@ -57,7 +60,7 @@ fn create_stacks(lines: &Vec<String>, index: &usize) -> anyhow::Result<Vec<VecDe
     Ok(crate_stacks)
 }
 
-fn parse_movements(crate_stacks: &mut Vec<VecDeque<String>>, lines: &Vec<String>, index: &usize) -> anyhow::Result<()> {
+fn parse_movements(crate_stacks: &mut Vec<VecDeque<String>>, lines: &Vec<String>, index: &usize, part_two: bool) -> anyhow::Result<()> {
     let is_digit = Regex::new(r"\d+")?;
     for movement_inst in &lines[*index..] {
         let counts = is_digit
@@ -69,16 +72,22 @@ fn parse_movements(crate_stacks: &mut Vec<VecDeque<String>>, lines: &Vec<String>
         let from_stack = counts[1] - 1; // adjust for zero based indexes
         let to_stack = counts[2] - 1; // adjust for zero based indexes
 
-        for _ in 0..num_crates {
-            let crate_id = &crate_stacks[from_stack]
-                .pop_front()
-                .expect("Unable to retrieve top of stack!");
-
-            let _ = &crate_stacks[to_stack].push_front(crate_id.to_owned());
-        }
+        move_crates(num_crates, from_stack, to_stack, crate_stacks, part_two);
     }
 
     Ok(())
+}
+
+fn move_crates(num_crates: usize, from_stack: usize, to_stack: usize, crate_stacks: &mut Vec<VecDeque<String>>, part_two: bool) {
+    let vec = crate_stacks[from_stack].drain(..num_crates).collect_vec();
+    let crates = match part_two {
+        true => vec.into_iter().rev().collect_vec(),
+        false => vec
+    };
+
+    for crate_id in crates {
+        let _ = &crate_stacks[to_stack].push_front(crate_id);
+    }
 }
 
 fn read_top_stacks(crate_stacks: &mut Vec<VecDeque<String>>) -> String {
